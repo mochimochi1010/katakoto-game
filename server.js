@@ -69,7 +69,7 @@ wss.on('connection', ws => {
                 broadcastGameState();
                 break;
             case 'startGame':
-                if (!gameState.gameStarted && gameState.playerCount >= 2) {
+                if (!gameState.gameStarted && gameState.playerCount >= 1) {
                     startGame();
                 }
                 break;
