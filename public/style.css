@@ -1,0 +1,96 @@
+/* ----------------------------------------------------------------
+ * 全体のスタイル
+ * ---------------------------------------------------------------- */
+body {
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* 上部に寄せる */
+    min-height: 100vh;
+    margin: 0;
+    padding-top: 50px; /* 上から少しスペースを開ける */
+    background-color: #f0f0f0; /* 背景色を薄い灰色に */
+}
+
+/* ----------------------------------------------------------------
+ * タイトル画面のコンテナ
+ * ---------------------------------------------------------------- */
+#title-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 350px;
+    padding: 20px;
+    background-color: white; /* コンテナの背景を白に */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ----------------------------------------------------------------
+ * タイトル文字（カタコト・コネクション）
+ * ---------------------------------------------------------------- */
+#game-title {
+    background-color: #888; /* 灰色 */
+    color: white; /* 文字は白 */
+    font-size: 32px;
+    font-weight: bold;
+    padding: 15px 30px;
+    margin-bottom: 25px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    /* 画像の「影付きの灰色ボックス」を再現 */
+}
+
+/* ----------------------------------------------------------------
+ * 名前入力欄と決定ボタン
+ * ---------------------------------------------------------------- */
+.name-input-group {
+    display: flex;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+#name-input {
+    flex-grow: 1; /* 入力欄を広げる */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px; /* 左側だけ角を丸く */
+    font-size: 16px;
+}
+
+#set-name-button {
+    background-color: #ddd; /* 薄い灰色 */
+    color: black;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 0 5px 5px 0; /* 右側だけ角を丸く */
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* ----------------------------------------------------------------
+ * メインボタン（ゲームスタートとインストール）
+ * ---------------------------------------------------------------- */
+#start-game-button, #install-button {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ゲームスタートボタン (赤/ピンク) */
+#start-game-button {
+    background-color: #ff9999; /* 薄い赤/ピンク */
+    color: #cc0000; /* 濃い赤字 */
+}
+
+/* インストールボタン (青) */
+#install-button {
+    background-color: #a0c3ff; /* 薄い青 */
+    color: #0000cc; /* 濃い青字 */
+}
