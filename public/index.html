@@ -27,7 +27,7 @@
         <div id="player-list"></div>
 
         <div id="phase-container">
-         <div id="matching-room-phase"> 
+         <div id="matching-room-phase" style="display: none;"> 
             
             <div id="player-list-container">
                 <div id="current-players">
@@ -57,17 +57,14 @@
 
     <script src="/socket.io/socket.io.js"></script>
 
-        <div class="game-container">
-            <div class="map-container">
-                <div id="top-left" class="area">形ある物</div>
-                <div id="top-right" class="area">形ある心</div>
-                <div id="bottom-left" class="area">形ない物</div>
-                <div id="bottom-right" class="area">形ない心</div>
+        <div id="main-game-area" style="display: none;">
+    <div class="game-container">
+        <div class="map-container">
             </div>
-            <div id="sidebar">
-                <h2>あなたのカード</h2>
-                <div id="my-cards" class="my-cards"></div>
-                </div>
+
+        <div id="card-area"> 
+            <p>あなたのカード</p>
+            </div>
         </div>
     </div>
 

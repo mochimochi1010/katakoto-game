@@ -181,12 +181,15 @@ function displayReceivedCards() {
 // ----------------------------------------------------
 // 画面切り替えのヘルパー関数 (全画面を非表示にする)
 // ----------------------------------------------------
+// 画面切り替えのヘルパー関数 (全画面を非表示にする)
 function hideAllPhases() {
     document.getElementById('start-screen').style.display = 'none';
     document.getElementById('matching-room-phase').style.display = 'none';
     document.getElementById('card-creation-phase').style.display = 'none';
-    // マップ画面など、他のゲームフェーズもここに追記
-    document.getElementById('game-screen').style.display = 'block'; // ゲーム画面全体は表示
+    // ★★★ 修正箇所: ここを追加します ★★★
+    document.getElementById('main-game-area').style.display = 'none'; 
+    // ... 他のゲームフェーズもここに追記 ...
+    document.getElementById('game-screen').style.display = 'block'; 
 }
 
 // ----------------------------------------------------
@@ -228,39 +231,44 @@ socket.onmessage = (event) => {
             console.log("Player ID assigned: " + data.playerId);
             break;
 
-        case 'gameStateUpdate': // サーバーからゲーム状態を受け取ったとき
-            
-            // サーバーから渡されたホスト名を取得
-            const hostName = data.hostName; 
-            const playerNames = Object.values(data.players).map(p => p.name).filter(name => name); // プレイヤー名の配列を作成
-            
-            const playerListContainer = document.getElementById('current-players');
-            playerListContainer.innerHTML = ''; 
+case 'gameStateUpdate': 
+    
+    // サーバーから渡されたホスト名を取得
+    const hostName = data.hostName; 
+    const playersMap = data.players; // プレイヤー情報全体
+    
+    // プレイヤー名の配列を作成
+    const playerNames = Object.values(playersMap)
+        .map(p => p.name)
+        .filter(name => name); 
+    
+    const playerListContainer = document.getElementById('current-players');
+    playerListContainer.innerHTML = ''; 
 
-            playerNames.forEach(name => {
-                let nameElement = document.createElement('span');
-                nameElement.textContent = name;
-                
-                // ★ホストの名前と一致する場合、クラスを付与★
-                if (name === hostName) {
-                    nameElement.classList.add('host-name');
-                }
-                
-                playerListContainer.appendChild(nameElement);
-                playerListContainer.appendChild(document.createElement('br'));
-            });
+    playerNames.forEach(name => {
+        let nameElement = document.createElement('span');
+        nameElement.textContent = name;
+        
+        // ★ホストの名前と一致する場合、クラスを付与★
+        if (name === hostName) {
+            nameElement.classList.add('host-name');
+        }
+        
+        playerListContainer.appendChild(nameElement);
+        playerListContainer.appendChild(document.createElement('br'));
+    });
 
-            // ★ホストのみボタンを有効化・表示化★
-            const startButton = document.getElementById('start-game-from-room-button');
-            if (myName === hostName) {
-                startButton.disabled = false;
-                startButton.style.opacity = 1; // ホストには目立たせる
-            } else {
-                startButton.disabled = true;
-                startButton.style.opacity = 0.5; // ホスト以外は無効化して薄く表示
-            }
-            
-            break;
+    // ★ホストのみボタンを有効化・表示化★
+    const startButton = document.getElementById('start-game-from-room-button');
+    if (myName === hostName) { // 自分の名前とホストの名前を比較
+        startButton.disabled = false;
+        startButton.style.opacity = 1; 
+    } else {
+        startButton.disabled = true;
+        startButton.style.opacity = 0.5;
+    }
+    
+    break;
 
         case 'startGame': // サーバーからゲーム開始の通知を受けたとき
             // ★マッチングルームからカード作成フェーズに切り替え★

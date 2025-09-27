@@ -163,3 +163,12 @@ body {
 #submit-cards-button:hover {
     background-color: #45a049;
 }
+
+/* ----------------------------------------------------------------
+ * ホストの名前を強調するスタイル
+ * ---------------------------------------------------------------- */
+.host-name {
+    color: #cc0000; /* 赤色に設定 */
+    font-weight: bold;
+    text-decoration: underline; 
+}
