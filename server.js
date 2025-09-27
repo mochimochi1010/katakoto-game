@@ -126,11 +126,30 @@ wss.on('connection', ws => {
     });
 
     ws.on('close', () => {
-        console.log(`Player disconnected: ${playerId}`);
+    // 接続時に割り当てた playerId を使用
+    if (gameState.players[playerId]) {
+        console.log(`Player disconnected: ${playerId} (${gameState.players[playerId].name || 'Unnamed'})`);
+
+        // 1. プレイヤーをゲーム状態から削除
+        const wasHost = (playerId === hostId);
         delete gameState.players[playerId];
         gameState.playerCount--;
+
+        // 2. ホストの再選出
+        if (wasHost) {
+            const remainingPlayerIds = Object.keys(gameState.players);
+            if (remainingPlayerIds.length > 0) {
+                // 残っているプレイヤーリストの最初のプレイヤーを新しいホストにする
+                hostId = remainingPlayerIds[0];
+            } else {
+                hostId = null; // 誰も残っていない
+            }
+        }
+
+        // 3. ゲーム状態を更新し、全員に通知
         broadcastGameState();
-    });
+    }
+});
 });
 
 // ゲーム開始処理
@@ -276,25 +295,34 @@ function endGame() {
     broadcast({ type: 'gameEnd', winner: winner });
 }
 
-// server.js の broadcastGameState() 関数全体を置き換え
+// server.js
 function broadcastGameState() {
-    // ⚠ hostId が null でないことを確認し、ホストの名前を取得
+    
+    // 1. 名前が設定済みのプレイヤーのみを抽出 (PlayerNを排除)
+    //    名前が null でない、かつ 'Player' で始まっていないプレイヤーを有効なプレイヤーとする
+    const activePlayers = Object.fromEntries(
+        Object.entries(gameState.players).filter(([id, p]) => p.name && !p.name.startsWith('Player'))
+    );
+    
+    // ホストの名前を取得 (ホストIDが有効で、そのプレイヤーがアクティブな場合)
     const hostName = hostId && gameState.players[hostId] ? gameState.players[hostId].name : null;
 
-    // クライアントに送るデータ構造を組み立て
     const data = {
-        type: 'gameStateUpdate',
-        players: gameState.players,
+        type: 'gameStateUpdate', 
+        
+        // 2. クライアントには、名前設定済みのプレイヤーリストのみを送る
+        players: activePlayers, 
+        
         gameStarted: gameState.gameStarted,
-        // ... その他の状態 ...
-        hostName: hostName // ★ホスト名をここに追加★
+        hostName: hostName // ホストの名前
     };
     
     // 全クライアントにブロードキャスト
-    Object.values(gameState.players).forEach(p => {
+    Object.values(gameState.players).forEach(p => { 
         p.ws.send(JSON.stringify(data));
     });
 }
+
 
 // メッセージを全クライアントに送信
 function broadcast(message) {
