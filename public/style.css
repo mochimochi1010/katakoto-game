@@ -94,3 +94,72 @@ body {
     background-color: #a0c3ff; /* 薄い青 */
     color: #0000cc; /* 濃い青字 */
 }
+
+/* ----------------------------------------------------------------
+ * ゲーム画面 2：カード作成フェーズのスタイル
+ * ---------------------------------------------------------------- */
+#card-creation-phase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 600px;
+}
+
+#category-display {
+    background-color: #e0f7ff; /* 薄い水色 */
+    border: 1px solid #c0e7ff;
+    padding: 20px 40px;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+#category-name {
+    color: red; /* カテゴリー部分を赤字に */
+}
+
+#card-input-guide {
+    margin-bottom: 25px;
+    font-size: 16px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+#card-input-container {
+    display: flex;
+    gap: 15px; /* カード間のスペース */
+    margin-bottom: 30px;
+}
+
+.card-input {
+    width: 100px; 
+    height: 50px;
+    text-align: center;
+    font-size: 18px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+#submit-cards-button {
+    padding: 12px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background-color: #4CAF50; /* 緑色のボタン */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#submit-cards-button:hover {
+    background-color: #45a049;
+}

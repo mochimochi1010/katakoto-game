@@ -28,6 +28,22 @@
 
         <div id="phase-container">
             </div>
+         <div id="card-creation-phase" style="display: none;">
+            <div id="category-display">お題のカテゴリーは<span id="category-name">〇〇〇〇</span></div>
+            
+            <div id="card-input-guide">
+                3枚のカードに文字を入れてね！<br>
+                1枚につきひらがな3文字までだよ！
+            </div>
+            
+            <div id="card-input-container">
+                <input type="text" class="card-input" maxlength="3" placeholder="あかい">
+                <input type="text" class="card-input" maxlength="3" placeholder="うまい">
+                <input type="text" class="card-input" maxlength="3" placeholder="〇〇〇">
+            </div>
+            
+            <button id="submit-cards-button">カードを提出</button>
+        </div>
 
     <script src="/socket.io/socket.io.js"></script>
 
