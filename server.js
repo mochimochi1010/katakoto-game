@@ -3,6 +3,10 @@ const http = require('http');
 const WebSocket = require('ws');
 
 const app = express();
+let players = {};
+let hostId = null; // 最初に接続したプレイヤーのIDを保存
+let currentCategory = '食べ物'; // 仮のカテゴリーを設定
+// ... その他の変数 ...
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
@@ -65,14 +69,29 @@ wss.on('connection', ws => {
         
         switch(data.type) {
             case 'setName':
-                gameState.players[playerId].name = data.name;
-                broadcastGameState();
-                break;
-            case 'startGame':
-                if (!gameState.gameStarted && gameState.playerCount >= 1) {
-                    startGame();
-                }
-                break;
+        // プレイヤー名を設定
+        gameState.players[playerId].name = data.name;
+
+        // ★★★ 修正・追加部分 ★★★
+        // ホストが未設定であれば、このプレイヤーをホストにする
+        if (!hostId) {
+            hostId = playerId;
+        }
+        // ★★★ ここまで修正・追加 ★★★
+        
+        // ゲーム状態をブロードキャスト（次のステップでこの関数を修正します）
+        broadcastGameState(); 
+        break;
+           case 'startGame':
+        // ★★★ 修正・確認部分 ★★★
+        // 接続時の playerId とホストIDが一致する場合のみ実行
+        if (playerId === hostId) {
+            if (!gameState.gameStarted && gameState.playerCount >= 1) {
+                // startGame() の処理（ゲーム開始のブロードキャスト）
+                startGame();
+            }
+        }
+        break;
             case 'submitCards':
                 // 子番がカードを提出
                 if (gameState.currentParentPlayer !== playerId) {
@@ -257,10 +276,24 @@ function endGame() {
     broadcast({ type: 'gameEnd', winner: winner });
 }
 
-// 全クライアントにゲーム状態をブロードキャスト
+// server.js の broadcastGameState() 関数全体を置き換え
 function broadcastGameState() {
-    const stateToSend = { ...gameState, players: Object.values(gameState.players).map(p => ({ ...p, ws: undefined })) };
-    broadcast({ type: 'gameStateUpdate', state: stateToSend });
+    // ⚠ hostId が null でないことを確認し、ホストの名前を取得
+    const hostName = hostId && gameState.players[hostId] ? gameState.players[hostId].name : null;
+
+    // クライアントに送るデータ構造を組み立て
+    const data = {
+        type: 'gameStateUpdate',
+        players: gameState.players,
+        gameStarted: gameState.gameStarted,
+        // ... その他の状態 ...
+        hostName: hostName // ★ホスト名をここに追加★
+    };
+    
+    // 全クライアントにブロードキャスト
+    Object.values(gameState.players).forEach(p => {
+        p.ws.send(JSON.stringify(data));
+    });
 }
 
 // メッセージを全クライアントに送信

@@ -1,3 +1,7 @@
+// public/game.js のファイル上部
+const socket = new WebSocket(window.location.href.replace('http', 'ws')); // WebSocketの接続
+let myName = ''; // 自分の名前を保持
+let currentHostName = null; // サーバーから送られてくるホスト名を保持
 const ws = new WebSocket('ws://localhost:3000');
 let myId = null;
 let gameState = {};
@@ -173,3 +177,98 @@ function displayReceivedCards() {
     // サーバーから受け取ったカードを表示
     // この部分はサーバーからのデータ送信が必要です
 }
+
+// ----------------------------------------------------
+// 画面切り替えのヘルパー関数 (全画面を非表示にする)
+// ----------------------------------------------------
+function hideAllPhases() {
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('matching-room-phase').style.display = 'none';
+    document.getElementById('card-creation-phase').style.display = 'none';
+    // マップ画面など、他のゲームフェーズもここに追記
+    document.getElementById('game-screen').style.display = 'block'; // ゲーム画面全体は表示
+}
+
+// ----------------------------------------------------
+// 1. 名前入力とマッチングルームへの移動
+// ----------------------------------------------------
+document.getElementById('start-game-button').addEventListener('click', () => {
+    const inputName = document.getElementById('name-input').value.trim();
+    if (inputName) {
+        myName = inputName;
+        
+        // サーバーに入室信号と名前を送信 (WebSocket形式)
+        socket.send(JSON.stringify({ type: 'setName', name: myName }));
+        
+        // ★タイトル画面からマッチングルームに切り替え★
+        hideAllPhases(); 
+        document.getElementById('matching-room-phase').style.display = 'flex';
+    }
+});
+
+// ----------------------------------------------------
+// 2. マッチングルームからのゲーム開始ボタン
+// ----------------------------------------------------
+document.getElementById('start-game-from-room-button').addEventListener('click', () => {
+    // サーバーにゲーム開始のシグナルを送る (WebSocket形式)
+    socket.send(JSON.stringify({ type: 'startGame' }));
+});
+
+
+// ----------------------------------------------------
+// 3. サーバーからのメッセージ受信（核となる処理）
+// ----------------------------------------------------
+socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+
+    switch (data.type) {
+        
+        case 'playerAssigned':
+            // 接続時にIDを受け取る処理 (既存のものがあればそのまま)
+            console.log("Player ID assigned: " + data.playerId);
+            break;
+
+        case 'gameStateUpdate': // サーバーからゲーム状態を受け取ったとき
+            
+            // サーバーから渡されたホスト名を取得
+            const hostName = data.hostName; 
+            const playerNames = Object.values(data.players).map(p => p.name).filter(name => name); // プレイヤー名の配列を作成
+            
+            const playerListContainer = document.getElementById('current-players');
+            playerListContainer.innerHTML = ''; 
+
+            playerNames.forEach(name => {
+                let nameElement = document.createElement('span');
+                nameElement.textContent = name;
+                
+                // ★ホストの名前と一致する場合、クラスを付与★
+                if (name === hostName) {
+                    nameElement.classList.add('host-name');
+                }
+                
+                playerListContainer.appendChild(nameElement);
+                playerListContainer.appendChild(document.createElement('br'));
+            });
+
+            // ★ホストのみボタンを有効化・表示化★
+            const startButton = document.getElementById('start-game-from-room-button');
+            if (myName === hostName) {
+                startButton.disabled = false;
+                startButton.style.opacity = 1; // ホストには目立たせる
+            } else {
+                startButton.disabled = true;
+                startButton.style.opacity = 0.5; // ホスト以外は無効化して薄く表示
+            }
+            
+            break;
+
+        case 'startGame': // サーバーからゲーム開始の通知を受けたとき
+            // ★マッチングルームからカード作成フェーズに切り替え★
+            hideAllPhases();
+            document.getElementById('card-creation-phase').style.display = 'flex';
+            document.getElementById('category-name').innerText = data.category; // サーバーからカテゴリーを受け取る
+            break;
+            
+        // ... 他のケース ...
+    }
+};
